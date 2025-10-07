@@ -171,7 +171,7 @@ const NEG_WORDS = ["Шоовдор", "зовлонтой", "харгис", "ай
 // Instructions for each part
 const PART_INSTRUCTIONS = [
   // Part 1: Self vs Others
-  "Зүүн гарын дунд эсвэл долоовор хурууг компьютерийн гарны E товчлуур, баруун гарын дунд эсвэл долоовор хурууг компьютерийн гарны I товчлуур дээр тус тус байрлуул. Дэлгэцийн зүүн дээд талд \"Би\", баруун дээд талд \"Тэд\" гэсэн 2 ангилал өгөгдөнө. Дэлгэцийн дээд талд өгөгдсөн хоёр ангилалд хамаарах үгнүүд дэлгэцийн голд нэг нэгээрээ гарч ирнэ. Зүүн талын \"Би\" ангилалд хамаарах үг гарч ирвэл E товчлуурыг; харин баруун талын \"Тэд\" ангилалд хамаарах үг гарч ирвэл I товчлуурыг дар. Үг бүр зөвхөн эдгээрийн аль нэг ангилалд хамаарна. Хэрэв Та алдаа гаргавал дэлгэцийн голд \"Х\" гарч ирнэ. Хэрэв Та алдаа гаргавал зөв товчлуурыг дар. Энэхүү даалгавар нь гүйцэтгэсэн хугацаагаар хэмжигддэг тул \"ЧАДАХ ЧИНЭЭГЭЭРЭЭ ХУРДАН\" мөн аль болох \"АЛДААГҮЙ ГҮЙЦЭТГЭ\". Хэрэв Та хэтэрхий удаан ажиллаж, олон алдаа гаргавал үр дүнг тооцох боломжгүй болно. Даалгаврыг хийж гүйцэтгэхэд ойролцоогоор 5 минут шаардагдана. Танд амжилт хүсье. Та зааврыг ойлгосон бол \"ЗАЙ АВАХ ТОВЧЛУУР\" дарж туршилтыг эхэлнэ.",
+  "Зүүн гарын дунд эсвэл долоовор хурууг компьютерийн гарны E товчлуур, баруун гарын дунд эсвэл долоовор хурууг компьютерийн гарны I товчлуур дээр тус тус байрлуул. Дэлгэцийн зүүн дээд талд \"Би\", баруун дээд талд \"Тэд\" гэсэн 2 ангилал өгөгдөнө. Дэлгэцийн дээд талд өгөгдсөн хоёр ангилалд хамаарах үгнүүд дэлгэцийн голд нэг нэгээрээ гарч ирнэ. Зүүн талын \"Би\" ангилалд хамаарах үг гарч ирвэл E товчлуурыг; харин баруун талын \"Тэд\" ангилалд хамаарах үг гарч ирвэл I товчлуурыг дар. Үг бүр зөвхөн эдгээрийн аль нэг ангилалд хамаарна. Хэрэв Та алдаа гаргавал дэлгэцийн голд \"Х\" гарч ирнэ. Хэрэв Та алдаа гаргавал зөв товчлуурыг дар. Энэхүү даалгавар нь гүйцэтгэсэн хугацаагаар хэмжигддэг тум \"ЧАДАХ ЧИНЭЭГЭЭРЭЭ ХУРДАН\" мөн аль болох \"АЛДААГҮЙ ГҮЙЦЭТГЭ\". Хэрэв Та хэтэрхий удаан ажиллаж, олон алдаа гаргавал үр дүнг тооцох боломжгүй болно. Даалгаврыг хийж гүйцэтгэхэд ойролцоогоор 5 минут шаардагдана. Танд амжилт хүсье. Та зааврыг ойлгосон бол \"ЗАЙ АВАХ ТОВЧЛУУР\" дарж туршилтыг эхэлнэ.",
 
   // Part 2: Positive vs Negative
   "Дэлгэцийн дээд талын өмнөх ангилалууд өөрчлөгдөж дэлгэцийн зүүн дээд талд \"Сайн\", баруун дээд талд \"Муу\" гэсэн 2 ангилал өгөгдсөн байна. Мөн 2 ангилалд хамаарах үгс ч өөрчлөгдсөн. Гэхдээ даалгаврын дүрэм хэвээрээ. Зүүн талын \"Сайн\" ангилалд хамаарах үг гарч ирвэл E товчлуурыг; харин баруун талын \"Муу\" ангилалд хамаарах үг гарч ирвэл I товчлуурыг дар. Үг бүр зөвхөн эдгээрийн аль нэг ангилалд хамаарна. Хэрэв Та алдаа гаргавал дэлгэцийн голд \"Х\" гарч ирнэ. Хэрэв Та алдаа гаргавал зөв товчлуурыг дар. Даалгаврыг \"ЧАДАХ ЧИНЭЭГЭЭРЭЭ ХУРДАН ГҮЙЦЭТГЭ\". Та зааврыг ойлгосон бол \"ЗАЙ АВАХ ТОВЧЛУУР\" дарж туршилтыг эхэлнэ.",
@@ -290,6 +290,9 @@ let records = [];
 let trialIndex = 0;
 let survey1Answers = {};
 let survey2Answers = {};
+
+// Шинээр нэмэгдсэн: Товч дарсан эсэхийг хянах
+let isSubmitting = false;
 
 /* ========== Helpers ========== */
 function shuffle(a){
@@ -519,28 +522,59 @@ document.addEventListener('keydown',(e)=>{
   }
 });
 
-// Survey navigation
-document.getElementById('btnSurvey1Next').addEventListener('click', function(){
+// Survey navigation - ШИНЭЧЛЭГДСЭН: Олон удаа дархаас сэргийлэх
+document.getElementById('btnSurvey1Next').addEventListener('click', function(e){
+  e.preventDefault();
+  
+  if (isSubmitting) return;
+  isSubmitting = true;
+  this.disabled = true;
+  this.textContent = 'Баярлалаа';
+  
   survey1Answers = collectSurvey1Answers();
   const allAnswered = Object.values(survey1Answers).every(answer => answer !== '');
   if(!allAnswered) {
     document.getElementById('survey1Err').textContent = 'Бүх асуултанд хариулна уу!';
     document.getElementById('survey1Err').classList.remove('hidden');
+    
+    isSubmitting = false;
+    this.disabled = false;
+    this.textContent = 'Дараачийн асуулга руу шилжих';
     return;
   }
+  
   document.getElementById('survey1Err').classList.add('hidden');
   currentPart++;
   showIntroForPart();
+  
+  // Товчыг дахин идэвхжүүлэх
+  setTimeout(() => {
+    isSubmitting = false;
+    this.disabled = false;
+    this.textContent = 'Дараачийн асуулга руу шилжих';
+  }, 1000);
 });
 
-document.getElementById('btnSurvey2Submit').addEventListener('click', function(){
+document.getElementById('btnSurvey2Submit').addEventListener('click', function(e){
+  e.preventDefault();
+  
+  if (isSubmitting) return;
+  isSubmitting = true;
+  this.disabled = true;
+  this.textContent = 'Түр хүлээнэ үү...';
+  
   survey2Answers = collectSurvey2Answers();
   const allAnswered = Object.values(survey2Answers).every(answer => answer !== '');
   if(!allAnswered) {
     document.getElementById('survey2Err').textContent = 'Бүх асуултанд хариулна уу!';
     document.getElementById('survey2Err').classList.remove('hidden');
+    
+    isSubmitting = false;
+    this.disabled = false;
+    this.textContent = 'Дуусгах';
     return;
   }
+  
   document.getElementById('survey2Err').classList.add('hidden');
   endPhase();
 });
