@@ -89,13 +89,22 @@
       <option value="other">Бусад</option>
     </select>
   </div>
+  <div class="form-row">
+    <label for="body_position">Биений байрлал</label>
+    <select id="body_position">
+      <option value="">Сонгох</option>
+      <option value="sitting">Эгц</option>
+      <option value="standing">Бөхийсөн</option>
+      <option value="other">Бусад</option>
+    </select>
+  </div>
   <div class="note">Enter дарж эсвэл доорх товчийг дарж үргэлжлүүлнэ.</div>
   <div style="text-align:center; margin-top:14px">
     <button class="btn" type="button" onclick="window.goIntro()">Зааварт шилжих</button>
   </div>
   <div class="err hidden" id="setupErr"></div>
 </div>
-
+  
 <!-- ===== 2) INSTRUCTIONS ===== -->
 <div class="frame hidden" id="intro">
   <div class="top">
@@ -274,7 +283,7 @@ const ageEl = document.getElementById('age');
 const genderEl = document.getElementById('gender');
 const completionMount = document.getElementById('completionMount');
 
-const participant = { id:"", age:null, gender:"" };
+const participant = { id:"", age:null, gender:"", body_position:"" };
 
 let currentPart = 0;
 let i = 0;
@@ -319,9 +328,14 @@ function hideErr(){ errEl.classList.add('hidden'); }
 window.goIntro = function(){
   const id = (pidEl.value||"").trim();
   const age = parseInt(ageEl.value,10);
+  const bodyPosition = document.getElementById('body_position').value;
   if(!id){ showErr('ID / Нэр заавал оруулна.'); return; }
   if(!Number.isFinite(age) || age<5 || age>120){ showErr('Насыг 5–120 хооронд оруулна уу.'); return; }
-  participant.id=id; participant.age=age; participant.gender=(genderEl.value||'');
+  participant.id=id; 
+  participant.age=age; 
+  participant.gender=(genderEl.value||'');
+  participant.body_position=bodyPosition;
+  
   hideErr();
   setup.classList.add('hidden');
   startStage();
@@ -571,7 +585,7 @@ async function sendToDiscord(payload) {
           fields: [
             {
               name: "👤 Оролцогч",
-              value: `**Нэр:** ${participant.participant}\n**Нас:** ${participant.age}\n**Хүйс:** ${participant.gender || 'Тодорхойгүй'}`,
+              value: `**Нэр:** ${participant.participant}\n**Нас:** ${participant.age}\n**Хүйс:** ${participant.gender || 'Тодорхойгүй'}\n**Биений байрлал:** ${participant.body_position || 'Тодорхойгүй'}`,
               inline: true
             },
             {
@@ -672,7 +686,7 @@ function toCSV(rows){
   ).join('\n');
 
   const metaLine =
-    `participant_id=${participant.id},age=${participant.age},gender=${participant.gender},started_at=${testStartedAt},finished_at=${testFinishedAt}`;
+    `participant_id=${participant.id},age=${participant.age},gender=${participant.gender},body_position=${participant.body_position},started_at=${testStartedAt},finished_at=${testFinishedAt}`;
 
   // Add survey answers to meta
   const survey1Meta = Object.entries(survey1Answers).map(([q, a]) => `survey1_${q}=${a}`).join(',');
@@ -742,7 +756,7 @@ function escapeHtml(str){ return String(str).replaceAll('&','&amp;').replaceAll(
 
 function renderCompletionUI(csv, filename){
   const previewText = [
-    `Participant: ${participant.id} | Age: ${participant.age} | Gender: ${participant.gender}`,
+    `Participant: ${participant.id} | Age: ${participant.age} | Gender: ${participant.gender} | Body_position: ${participant.body_position}`,
     `Started: ${testStartedAt} | Finished: ${testFinishedAt}`,
     `Trials: ${records.length} | Correct: ${records.filter(r=>r.correct===1).length} | Incorrect: ${records.filter(r=>r.correct===0).length}`,
     ``,
